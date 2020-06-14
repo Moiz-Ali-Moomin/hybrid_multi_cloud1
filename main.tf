@@ -162,7 +162,7 @@ provisioner "remote-exec" {
       "sudo mkfs.ext4  /dev/xvdd",
       "sudo mount  /dev/xvdd  /var/www/html",
       "sudo rm -rf /var/www/html/*",
-      "sudo git clone https://github.com/vimallinuxworld13/multicloud.git /var/www/html/"
+      "sudo git clone https://github.com/Moiz-Ali-Moomin/hybrid_multi_cloud1.git /var/www/html/"
     ]
   }
 }
