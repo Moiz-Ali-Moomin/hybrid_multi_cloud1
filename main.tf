@@ -277,7 +277,9 @@ resource "aws_cloudfront_distribution" "s3_distribution" {
     inline = [                   
    "sudo su",
    "sudo cd /var/www/html/",
-   "echo \"<img src="http://${aws_cloudfront_distribution.s3_distribution.domain_name}$/{aws_s3_bucket_object.myobject.key}">\" >> index.php"   
+   "sudo su << EOF",
+   "echo \"<img src="http://${aws_cloudfront_distribution.s3_distribution.domain_name}$/{aws_s3_bucket_object.myobject.key}">\" >> index.php",   
+   "EOF",
     ]
   }
 }
