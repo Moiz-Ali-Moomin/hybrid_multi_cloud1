@@ -185,20 +185,23 @@ resource "aws_s3_bucket" "my-web-code" {
   bucket = "my-web-code"
   acl    = "public-read"
 
+  provisioner "local-exec"  {
+    command = "git clone https://github.com/Moiz-Ali-Moomin/hybrid_multi_cloud1.git images"
+  }
+
   versioning {
     enabled = true
   }
   tags = {
-      Name = "web-code-bucket"
+      Name = "web-code-bucket"  
   }
 }
 
-resource "aws_s3_bucket_object" "object" {
+resource "aws_s3_bucket_object" "myobject" {
   bucket = aws_s3_bucket.my-web-code.bucket
-  key    = "myimage"
+  key    = "image.png"
   acl = "public-read"
-  source = "C:/Users/root/Desktop/myimage.jpg"
-  etag = filemd5("C:/Users/root/Desktop/myimage.jpg")
+  source = "images/image.png"
 }
 
 resource "aws_cloudfront_origin_access_identity" "origin_access_identity" {
@@ -274,7 +277,7 @@ resource "aws_cloudfront_distribution" "s3_distribution" {
     inline = [                   
    "sudo su",
    "sudo cd /var/www/html/",
-   "echo '<img src=http://you_cloud_url/${aws_cloudfront_distribution.s3_distribution.domain_name}>' >> index.php"   
+   "echo \"<img src="http://${aws_cloudfront_distribution.s3_distribution.domain_name}$/{aws_s3_bucket_object.myobject.key}">\" >> index.php"   
     ]
   }
 }
