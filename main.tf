@@ -104,13 +104,12 @@ resource "aws_security_group" "allow_network_services" {
    cidr_blocks = [ "0.0.0.0/0" ]  
 }
 
-ingress {
-  description = "Checking Connection"
-  cidr_blocks = ["0.0.0.0/0"]
-  protocol = "icmp"
-  from_port = 8
-  to_port = 0
-}
+	ingress {
+    from_port = -1
+    to_port = -1
+    protocol = "icmp"
+    cidr_blocks = ["0.0.0.0/0"]
+    }
 
  egress {
     from_port   = 0
@@ -188,6 +187,12 @@ resource "aws_s3_bucket" "my-web-code" {
   provisioner "local-exec"  {
     command = "git clone https://github.com/Moiz-Ali-Moomin/hybrid_multi_cloud1.git images"
   }
+
+    provisioner "local-exec" {
+		
+			when = destroy
+			command = "rm -rf images"
+		}
 
   versioning {
     enabled = true
