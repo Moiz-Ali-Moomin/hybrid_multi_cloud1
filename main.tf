@@ -19,11 +19,11 @@ resource "aws_key_pair" "generated_key" {
 }
 
 resource "aws_instance" "myos" {
- ami           = "ami-0447a12f28fddb066"
+ ami           = "ami-0732b62d310b80e97"
  availability_zone = "ap-south-1a"
  key_name   = var.key_name
  instance_type = "t2.micro"
- security_groups = ["allow_network_services"]
+ security_groups = [aws_security_group.allow_network_services.name]
 
   connection {
     type     = "ssh"
@@ -104,12 +104,13 @@ resource "aws_security_group" "allow_network_services" {
    cidr_blocks = [ "0.0.0.0/0" ]  
 }
 
-	ingress {
-    from_port = -1
-    to_port = -1
-    protocol = "icmp"
-    cidr_blocks = ["0.0.0.0/0"]
-    }
+ingress {
+  description = "Checking Connection"
+  cidr_blocks = ["0.0.0.0/0"]
+  protocol = "icmp"
+  from_port = -1
+  to_port = -1
+}
 
  egress {
     from_port   = 0
@@ -141,12 +142,9 @@ resource "aws_volume_attachment" "attaching_ebs" {
 }
 
 
-
 resource "null_resource" "nullremote1"  {
 
-depends_on = [
-    aws_volume_attachment.attaching_ebs,
-  ]
+depends_on = [aws_volume_attachment.attaching_ebs,aws_key_pair.generated_key]
 
 
   connection {
@@ -171,7 +169,8 @@ resource "null_resource" "nulllocal2"  {
 
 depends_on = [
     null_resource.nullremote1,
-    aws_cloudfront_distribution.s3_distribution
+    aws_cloudfront_distribution.s3_distribution,
+    aws_key_pair.generated_key,
   ]
 
 
@@ -283,7 +282,7 @@ resource "aws_cloudfront_distribution" "s3_distribution" {
    "sudo su",
    "sudo cd /var/www/html/",
    "sudo su << EOF",
-   "echo \"<img src=http://${aws_cloudfront_distribution.s3_distribution.domain_name}$/{aws_s3_bucket_object.myobject.key}>\" >> index.php",   
+   "echo \"<img src='http://${aws_cloudfront_distribution.s3_distribution.domain_name}$/{aws_s3_bucket_object.myobject.key}'>\" >> index.php",   
    "EOF",
     ]
   }
